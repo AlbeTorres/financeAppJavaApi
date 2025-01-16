@@ -2,7 +2,13 @@ package com.apifinanceapp.financeapp.model;
 
 import com.apifinanceapp.financeapp.model.common.Languaje;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 public class Settings {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Languaje language;
     private String userId;

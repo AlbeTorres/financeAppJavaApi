@@ -2,7 +2,7 @@ package com.apifinanceapp.financeapp.model.tokens;
 
 import java.time.LocalDateTime;
 
-public class Token {
+abstract class Token {
 
     private String id;
     private String email;

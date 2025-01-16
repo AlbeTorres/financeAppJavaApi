@@ -1,6 +1,12 @@
 package com.apifinanceapp.financeapp.model;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 public class TwoFactorConfirmation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String userId;
 

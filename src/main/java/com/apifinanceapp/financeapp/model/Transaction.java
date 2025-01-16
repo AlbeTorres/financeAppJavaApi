@@ -3,8 +3,13 @@ package com.apifinanceapp.financeapp.model;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
-public class Transaction {
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
+public class Transaction {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private BigInteger amount;
