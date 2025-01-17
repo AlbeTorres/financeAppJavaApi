@@ -2,8 +2,15 @@ package com.apifinanceapp.financeapp.model.tokens;
 
 import java.time.LocalDateTime;
 
-abstract class Token {
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
+abstract class Token {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String email;
     private String token;

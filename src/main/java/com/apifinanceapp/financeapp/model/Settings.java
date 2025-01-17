@@ -2,53 +2,27 @@ package com.apifinanceapp.financeapp.model;
 
 import com.apifinanceapp.financeapp.model.common.Languaje;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Settings {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Languaje language;
-    private String userId;
-
-    public Settings() {
-    }
-
-    public Settings(String id, Languaje language, String userId) {
-        this.id = id;
-        this.language = language;
-        this.userId = userId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Languaje getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(Languaje language) {
-        this.language = language;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return "Settings [id=" + id + ", language=" + language + ", userId=" + userId + "]";
-    }
+    @OneToOne(mappedBy = "settings", cascade = CascadeType.ALL, orphanRemoval = true)
+    private User user;
 
 }

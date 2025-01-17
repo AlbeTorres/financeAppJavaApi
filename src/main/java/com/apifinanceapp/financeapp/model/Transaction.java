@@ -3,10 +3,20 @@ package com.apifinanceapp.financeapp.model;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,94 +30,11 @@ public class Transaction {
 
     private LocalDateTime date;
 
-    private String accountId;
-
     private String categoryId;
 
     private String userId;
 
-    // Constructor requerido por JPA
-    public Transaction() {
-    }
-
-    public Transaction(String id, BigInteger amount, LocalDateTime date, String accountId, String categoryId,
-            String userId) {
-        this.id = id;
-        this.amount = amount;
-        this.date = date;
-        this.accountId = accountId;
-        this.categoryId = categoryId;
-        this.userId = userId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public BigInteger getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigInteger amount) {
-        this.amount = amount;
-    }
-
-    public String getPayee() {
-        return payee;
-    }
-
-    public void setPayee(String payee) {
-        this.payee = payee;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction [id=" + id + ", amount=" + amount + ", payee=" + payee + ", notes=" + notes + ", date="
-                + date + ", accountId=" + accountId + ", categoryId=" + categoryId + ", userId=" + userId + "]";
-    }
-
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private BankAccount bankAccount;
 }

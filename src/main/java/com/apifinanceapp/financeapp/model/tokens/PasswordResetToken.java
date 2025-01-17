@@ -2,6 +2,9 @@ package com.apifinanceapp.financeapp.model.tokens;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class PasswordResetToken extends Token {
     public PasswordResetToken() {
         super();
