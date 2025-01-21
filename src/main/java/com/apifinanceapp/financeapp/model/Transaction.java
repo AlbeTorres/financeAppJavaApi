@@ -30,11 +30,13 @@ public class Transaction {
 
     private LocalDateTime date;
 
-    private String categoryId;
-
-    private String userId;
-
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "bankAccount_id")
     private BankAccount bankAccount;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private BankAccount category;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

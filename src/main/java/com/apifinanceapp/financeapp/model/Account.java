@@ -20,9 +20,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
     private String type;
     private String provider;
     private String providerAccountId;
@@ -35,4 +32,8 @@ public class Account {
     private String sessionState;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

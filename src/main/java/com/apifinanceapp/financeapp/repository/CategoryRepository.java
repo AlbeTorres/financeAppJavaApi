@@ -2,6 +2,8 @@ package com.apifinanceapp.financeapp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CategoryRepository extends JpaRepository<CategoryRepository, String> {
+import com.apifinanceapp.financeapp.model.Category;
+
+public interface CategoryRepository extends JpaRepository<Category, String> {
 
 }

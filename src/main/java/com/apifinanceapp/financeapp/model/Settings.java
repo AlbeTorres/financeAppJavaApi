@@ -22,6 +22,9 @@ public class Settings {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Languaje language;
+    private boolean darkMode;
+    private boolean notifications;
+
     @OneToOne(mappedBy = "settings", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 

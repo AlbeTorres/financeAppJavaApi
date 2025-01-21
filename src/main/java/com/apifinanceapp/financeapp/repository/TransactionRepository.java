@@ -2,6 +2,8 @@ package com.apifinanceapp.financeapp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TransactionRepository extends JpaRepository<TransactionRepository, String> {
+import com.apifinanceapp.financeapp.model.Transaction;
+
+public interface TransactionRepository extends JpaRepository<Transaction, String> {
 
 }
