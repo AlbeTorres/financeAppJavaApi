@@ -1,5 +1,6 @@
 package com.apifinanceapp.financeapp.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,9 +9,12 @@ import com.apifinanceapp.financeapp.model.BankAccount;
 
 @Service
 public class BankAccountService {
+    BankAccount bankAccount = new BankAccount("1", "1", 1000, "Bank of America", null, null);
+    List<BankAccount> lista = new ArrayList<BankAccount>();
 
     public List<BankAccount> getBankAccountsByUser() {
-        return null;
+        lista.add(bankAccount);
+        return lista;
     }
 
     public BankAccount getBankAccountById(String id) {

@@ -39,7 +39,7 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-    public BankAccount putMethodName(@PathVariable String id, @RequestBody BankAccount bankAccount) {
+    public BankAccount updateBankAccount(@PathVariable String id, @RequestBody BankAccount bankAccount) {
         return bankAccountService.updateBankAccount(id, bankAccount);
     }
 
