@@ -1,54 +1,54 @@
 package com.apifinanceapp.financeapp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.apifinanceapp.financeapp.model.Settings;
-import com.apifinanceapp.financeapp.model.common.Languaje;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.apifinanceapp.financeapp.model.Settings;
+
+import com.apifinanceapp.financeapp.repository.SettingsRepository;
+
+@Service
 public class SettingsService {
 
-    Settings settings = new Settings("1", Languaje.ES, true, true, null);
-
-    List<Settings> settingslist = new ArrayList<Settings>();
-
-    public void populateSettings() {
-        settingslist.add(settings);
-    }
+    @Autowired
+    SettingsRepository settingsRepository;
 
     public List<Settings> getSettingsByUser() {
-        return settingslist;
+        return settingsRepository.findAll();
     }
 
     public Settings getSettingsById(String id) {
-        return settingslist.stream().filter(settings -> settings.getId().equals(id)).findFirst().orElse(null);
+        return settingsRepository.findById(id).orElse(null);
     }
 
     public Settings updateSettings(String id, Settings settings) {
 
-        for (Settings s : settingslist) {
-            if (s.getId().equals(id)) {
-                updateFields(settings, s);
-                return s;
-            }
-        }
+        Settings target = settingsRepository.findById(id).orElse(null);
 
+        if (target != null) {
+            updateFields(target, settings);
+            return settingsRepository.save(target);
+        }
         return null;
     }
 
     public Settings createSettings(Settings settings) {
-        settingslist.add(settings);
-        return settings;
+        return settingsRepository.save(settings);
     }
 
     public String deleteSettings(String id) {
-        for (Settings s : settingslist) {
-            if (s.getId().equals(id)) {
-                updateFields(settings, s);
-                return "Settings with id " + id + " has been deleted";
-            }
+
+        Settings target = settingsRepository.findById(id).orElse(null);
+
+        if (target != null) {
+            settingsRepository.deleteById(id);
+            return "Settings satisfactory deleted"; // Salir del bucle si se eliminó el usuario
+
         }
-        return "Settings not found";
+
+        return "Settings not found"; // Devolver mensaje de usuario eliminado
     }
 
     private void updateFields(Settings target, Settings source) {

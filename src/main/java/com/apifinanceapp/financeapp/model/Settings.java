@@ -1,5 +1,7 @@
 package com.apifinanceapp.financeapp.model;
 
+import org.springframework.stereotype.Component;
+
 import com.apifinanceapp.financeapp.model.common.Languaje;
 
 import jakarta.persistence.CascadeType;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Component
 @NoArgsConstructor
 @AllArgsConstructor
 public class Settings {

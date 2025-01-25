@@ -3,6 +3,8 @@ package com.apifinanceapp.financeapp.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.apifinanceapp.financeapp.model.common.Role;
 
 import jakarta.persistence.CascadeType;
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Component
 @Table(name = "app_user")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,6 +2,8 @@ package com.apifinanceapp.financeapp.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Component
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

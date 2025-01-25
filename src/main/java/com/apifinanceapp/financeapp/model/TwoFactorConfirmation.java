@@ -1,5 +1,7 @@
 package com.apifinanceapp.financeapp.model;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Component
 @NoArgsConstructor
 @AllArgsConstructor
 public class TwoFactorConfirmation {

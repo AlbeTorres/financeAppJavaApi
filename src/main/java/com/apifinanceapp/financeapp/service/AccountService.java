@@ -1,55 +1,54 @@
 package com.apifinanceapp.financeapp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.apifinanceapp.financeapp.model.Account;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.apifinanceapp.financeapp.model.Account;
+import com.apifinanceapp.financeapp.repository.AccountRepository;
+
+@Service
 public class AccountService {
-    Account account = Account.builder().id("1").type("1").provider("google").providerAccountId("1").build();
-    List<Account> lista = new ArrayList<Account>();
+
+    @Autowired
+    AccountRepository accountRepository;
 
     public List<Account> getAccountsByUser() {
-        lista.add(account);
-        return lista;
+        return accountRepository.findAll();
     }
 
     public Account getAccountById(String id) {
-        System.out.println(id);
-        return lista.stream().filter(account -> account.getId().equals(id)).findFirst().orElse(null);
+        return accountRepository.findById(id).orElse(null);
     }
 
     public Account createAccount(Account account) {
-        System.out.println(account);
-        return account;
+        return accountRepository.save(account);
     }
 
     public Account updateAccount(String id, Account account) {
         System.out.println("ID: " + id + ", User: " + account);
 
-        // Usar un solo stream para buscar y actualizar
-        for (Account accountx : lista) {
-            if (account.getId().equals(id)) {
-                updateFields(accountx, account);
-                return account; // Devolver el account actualizado inmediatamente
-            }
-        }
+        Account target = accountRepository.findById(id).orElse(null);
 
-        return null; // Devolver null si no se encontró el account
+        if (target != null) {
+            updateFields(target, account);
+            return accountRepository.save(target);
+        }
+        return null;
     }
 
     public String deleteAccount(String id) {
 
-        System.out.println(id);
+        Account target = accountRepository.findById(id).orElse(null);
 
-        for (Account account : lista) {
-            if (account.getId().equals(id)) {
-                lista.remove(account);
-                return "Account satisfactory deleted"; // Salir del bucle si se eliminó
-            }
+        if (target != null) {
+            accountRepository.deleteById(id);
+            return "Account satisfactory deleted"; // Salir del bucle si se eliminó el usuario
+
         }
 
-        return "Account not found"; // Devolver mensaje de eliminado
+        return "Account not found"; // Devolver mensaje de usuario eliminado
     }
 
     private void updateFields(Account target, Account source) {

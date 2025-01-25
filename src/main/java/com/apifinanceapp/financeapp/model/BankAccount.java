@@ -2,6 +2,8 @@ package com.apifinanceapp.financeapp.model;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

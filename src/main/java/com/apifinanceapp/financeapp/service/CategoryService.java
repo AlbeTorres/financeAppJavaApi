@@ -1,56 +1,52 @@
 package com.apifinanceapp.financeapp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.apifinanceapp.financeapp.model.Category;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.apifinanceapp.financeapp.model.Category;
+import com.apifinanceapp.financeapp.repository.CategoryRepository;
+
+@Service
 public class CategoryService {
 
-    Category category = new Category("1", "Gasto", null);
-    List<Category> lista = new ArrayList<Category>();
+    @Autowired
+    CategoryRepository categoryRepository;
 
     public List<Category> getCategoriesByUser() {
-        lista.add(category);
-        return lista;
+        return categoryRepository.findAll();
     }
 
     public Category getCategoryById(String id) {
-        System.out.println(id);
-        return lista.stream().filter(category -> category.getId().equals(id)).findFirst().orElse(null);
+        return categoryRepository.findById(id).orElse(null);
     }
 
     public Category createCategory(Category category) {
-        System.out.println(category);
-        return category;
+        return categoryRepository.save(category);
     }
 
     public Category updateCategory(String id, Category category) {
-        System.out.println("ID: " + id + ", User: " + category);
+        Category target = categoryRepository.findById(id).orElse(null);
 
-        // Usar un solo stream para buscar y actualizar
-        for (Category categoryx : lista) {
-            if (category.getId().equals(id)) {
-                updateFields(categoryx, category);
-                return category;
-            }
+        if (category != null) {
+            updateFields(target, category);
+            return categoryRepository.save(target);
         }
-
         return null;
     }
 
     public String deleteCategory(String id) {
 
-        System.out.println(id);
+        Category target = categoryRepository.findById(id).orElse(null);
 
-        for (Category category : lista) {
-            if (category.getId().equals(id)) {
-                lista.remove(category);
-                return "Category satisfactory deleted"; // Salir del bucle si se eliminó
-            }
+        if (target != null) {
+            categoryRepository.deleteById(id);
+            return "Category satisfactory deleted"; // Salir del bucle si se eliminó el usuario
+
         }
 
-        return "Category not found"; // Devolver mensaje de eliminado
+        return "Category not found"; // Devolver mensaje de usuario eliminado
     }
 
     private void updateFields(Category target, Category source) {
