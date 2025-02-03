@@ -2,6 +2,7 @@ package com.apifinanceapp.financeapp.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.apifinanceapp.financeapp.model.Transaction;
 import com.apifinanceapp.financeapp.repository.TransactionRepository;
@@ -9,6 +10,7 @@ import com.apifinanceapp.financeapp.repository.TransactionRepository;
 @Service
 public class TransactionService {
 
+    @Autowired
     TransactionRepository transactionRepository;
 
     public List<Transaction> getTransactionsByUser() {
