@@ -51,6 +51,10 @@ public class UserService {
         return "User not found"; // Devolver mensaje de usuario eliminado
     }
 
+    public List<User> searchUsers(String keyword) {
+        return userRepository.searchUsers(keyword);
+    }
+
     private void updateFields(User target, User source) {
         // Actualizar solo los campos no nulos
         if (source.getName() != null)
