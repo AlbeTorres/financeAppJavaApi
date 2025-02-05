@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apifinanceapp.financeapp.model.User;
-
 import com.apifinanceapp.financeapp.repository.UserRepository;
 
 @Service
@@ -71,4 +70,5 @@ public class UserService {
             target.setImage(source.getImage());
         target.setTwofactorEnabled(source.isTwofactorEnabled()); // Campo booleano siempre se actualiza
     }
+
 }

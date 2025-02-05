@@ -33,6 +33,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
+    private String username;
     private String email;
     private LocalDateTime emailVerified; // Cambiar a LocalDateTime si usas una librería como java.time
     private String password;

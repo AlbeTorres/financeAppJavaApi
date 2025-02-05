@@ -1,5 +1,7 @@
 POST http://localhost:8080/user
+Authorization: Basic YWxiZToxMjM=
 Content-Type: application/json
+User-Agent: Mozilla/5.0
 
 {
   "name": "John Doe",
