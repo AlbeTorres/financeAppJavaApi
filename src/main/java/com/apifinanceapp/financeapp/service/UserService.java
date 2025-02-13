@@ -1,29 +1,61 @@
 package com.apifinanceapp.financeapp.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.apifinanceapp.financeapp.dto.user.UserCreateRequest;
+import com.apifinanceapp.financeapp.dto.user.UserResponse;
+import com.apifinanceapp.financeapp.mappers.UserMapper;
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toResponse)
+                .collect(Collectors.toList());
+
     }
 
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
+    public UserResponse getUserById(String id) {
+
+        // TODO: Añadir excepciones para los errores ver video de manejo de excepciones
+
+        // Validar el id (puedes usar una expresión regular o simplemente comprobar que
+        // no esté vacío)
+        if (id == null || id.trim().isEmpty()) {
+            // TODO: Añadir excepciones para los errores ver video de manejo de excepciones
+            return null;
+        }
+
+        // Si el id es un UUID, por ejemplo, puedes validarlo con una expresión regular
+        if (!id.matches("^[a-fA-F0-9-]{36}$")) { // Si es un UUID
+            // TODO: Añadir excepciones para los errores ver video de manejo de excepciones
+            return null;
+        }
+
+        User user = userRepository.findById(id).orElse(null);
+        return user != null ? convertToDTO(user) : null;
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponse createUser(UserCreateRequest request) {
+        User user = userMapper.toEntity(request);
+        // TODO revizar si esto es lo mismo que bcrypt
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponse(savedUser);
     }
 
     public User updateUser(String id, User user) {
@@ -69,6 +101,22 @@ public class UserService {
         if (source.getImage() != null)
             target.setImage(source.getImage());
         target.setTwofactorEnabled(source.isTwofactorEnabled()); // Campo booleano siempre se actualiza
+    }
+
+    private UserResponse convertToDTO(User user) {
+        return new UserResponse(
+                user.getId(), // id
+                user.getName(), // name
+                user.getUsername(), // username
+                user.getEmail(), // email
+                user.getEmailVerified(), // emailVerified
+                user.getRole(), // role
+                user.getImage(), // image
+                user.isTwofactorEnabled(), // isTwofactorEnabled
+                null,
+                null,
+                null,
+                null);
     }
 
 }
