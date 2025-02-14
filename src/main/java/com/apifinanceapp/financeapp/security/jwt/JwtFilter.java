@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.Configuration;
+package com.apifinanceapp.financeapp.security.jwt;
 
 import java.io.IOException;
 
@@ -11,8 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.apifinanceapp.financeapp.service.JWTService;
-import com.apifinanceapp.financeapp.service.MyUserDetailsService;
+import com.apifinanceapp.financeapp.security.service.MyUserDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,11 +28,15 @@ public class JwtFilter extends OncePerRequestFilter {
     ApplicationContext context;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+            HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
+
+        System.out.println("authHeader: " + authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);

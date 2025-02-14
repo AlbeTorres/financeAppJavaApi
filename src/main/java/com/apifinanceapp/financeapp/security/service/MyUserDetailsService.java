@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.service;
+package com.apifinanceapp.financeapp.security.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.apifinanceapp.financeapp.model.User;
-import com.apifinanceapp.financeapp.model.UserPrincipal;
 import com.apifinanceapp.financeapp.repository.UserRepository;
+import com.apifinanceapp.financeapp.security.model.UserPrincipal;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -19,12 +19,12 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsername(username);
+        // User user = userRepository.findByUsername(username).orElseThrow(() -> new
+        // UsernameNotFoundException("Usuario no encontrado"));
 
-        if (user == null) {
-            System.out.println("User not found ");
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "No se encontró usuario con el identificador: " + username));
 
         return new UserPrincipal(user);
     }

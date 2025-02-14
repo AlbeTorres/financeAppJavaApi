@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.Configuration;
+package com.apifinanceapp.financeapp.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +17,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.apifinanceapp.financeapp.security.jwt.JwtFilter;
+
+// Clase para la seguridad Spring Security
+
 @Configuration
-@EnableWebSecurity
-public class WebSecurityConfiguration {
+@EnableWebSecurity // Permite a Spring aplicar esta configuración de seguridad global
+public class SecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -33,23 +37,34 @@ public class WebSecurityConfiguration {
         return httpSecurity.csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
 
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    // cuando pasas los datos para loguearte ese objeto que tu server recive es un
+    // un-authentication object que aun no se ha autenticado ese tiene que ir a un
+    // authentication provider para que este provea el servicio de autenticacarlo y
+    // devolver un authentication object. Este es el metodo que se encarga de hacer
+    // eso, por defecto hay uno pero este es uno personalizado para que se adapte a
+    // nuestros requisitos
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    AuthenticationProvider authenticationProvider() {
+        // este es un objeto que implementa la interfaz AuthenticationProvider
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+
+        // le pasamos el servicio que se encarga de buscar el usuario en la base de
+        // datos
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
+
 }

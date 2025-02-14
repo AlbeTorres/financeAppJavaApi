@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.service;
+package com.apifinanceapp.financeapp.security.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.repository.UserRepository;
+import com.apifinanceapp.financeapp.security.jwt.JWTService;
 
 @Service
 public class AuthService {

@@ -3,7 +3,7 @@ package com.apifinanceapp.financeapp.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.apifinanceapp.financeapp.dto.user.UserCreateRequest;
@@ -20,7 +20,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> getUsers() {
         return userRepository.findAll().stream()
@@ -47,12 +46,12 @@ public class UserService {
         }
 
         User user = userRepository.findById(id).orElse(null);
-        return user != null ? convertToDTO(user) : null;
+        return user != null ? userMapper.toResponse(user) : null;
     }
 
     public UserResponse createUser(UserCreateRequest request) {
         User user = userMapper.toEntity(request);
-        // TODO revizar si esto es lo mismo que bcrypt
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
         return userMapper.toResponse(savedUser);
@@ -63,7 +62,6 @@ public class UserService {
         User target = userRepository.findById(id).orElse(null);
 
         if (user != null) {
-            updateFields(target, user);
             return userRepository.save(target);
         }
         return null;
@@ -82,41 +80,8 @@ public class UserService {
         return "User not found"; // Devolver mensaje de usuario eliminado
     }
 
-    public List<User> searchUsers(String keyword) {
-        return userRepository.searchUsers(keyword);
-    }
-
-    private void updateFields(User target, User source) {
-        // Actualizar solo los campos no nulos
-        if (source.getName() != null)
-            target.setName(source.getName());
-        if (source.getEmail() != null)
-            target.setEmail(source.getEmail());
-        if (source.getEmailVerified() != null)
-            target.setEmailVerified(source.getEmailVerified());
-        if (source.getPassword() != null)
-            target.setPassword(source.getPassword());
-        if (source.getRole() != null)
-            target.setRole(source.getRole());
-        if (source.getImage() != null)
-            target.setImage(source.getImage());
-        target.setTwofactorEnabled(source.isTwofactorEnabled()); // Campo booleano siempre se actualiza
-    }
-
-    private UserResponse convertToDTO(User user) {
-        return new UserResponse(
-                user.getId(), // id
-                user.getName(), // name
-                user.getUsername(), // username
-                user.getEmail(), // email
-                user.getEmailVerified(), // emailVerified
-                user.getRole(), // role
-                user.getImage(), // image
-                user.isTwofactorEnabled(), // isTwofactorEnabled
-                null,
-                null,
-                null,
-                null);
-    }
+    // public List<User> searchUsers(String keyword) {
+    // return userRepository.searchUsers(keyword);
+    // }
 
 }

@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.service;
+package com.apifinanceapp.financeapp.security.jwt;
 
 import java.util.Base64;
 import java.util.Date;
@@ -32,6 +32,7 @@ public class JWTService {
 
     }
 
+    // Genera el jwt
     public String generateToken(String username) {
 
         Map<String, Object> claims = new HashMap<>();
@@ -40,6 +41,12 @@ public class JWTService {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)).and().signWith(getKey())
                 .compact();
 
+    }
+
+    // Valida el jwt
+    public boolean validateToken(String token, String username) {
+        final String usernameToken = extractUsername(token);
+        return (usernameToken.equals(username) && !isTokenExpired(token));
     }
 
     public SecretKey getKey() {
@@ -58,11 +65,6 @@ public class JWTService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
-    }
-
-    public boolean validateToken(String token, String username) {
-        final String usernameToken = extractUsername(token);
-        return (usernameToken.equals(username) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

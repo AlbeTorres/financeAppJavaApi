@@ -10,3 +10,9 @@ User-Agent: Mozilla/5.0
   "image": "https://example.com/profile.jpg",
   "isTwofactorEnabled": true
 }
+
+
+
+
+2025-02-13T21:50:48.479-05:00  WARN 16672 --- [financeapp] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-02-13T21:50:48.559-05:00  WARN 16672 --- [financeapp] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
