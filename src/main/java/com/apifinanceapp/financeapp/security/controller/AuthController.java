@@ -1,6 +1,5 @@
 package com.apifinanceapp.financeapp.security.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
     public User userRegister(@RequestBody User user) {
@@ -26,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String userLogin(@RequestBody AuthRequest authenticationRequest) {
-        return authService.loginUser(authenticationRequest.getUsername(),
+        return authService.loginUser(authenticationRequest.getEmail(),
                 authenticationRequest.getPassword());
 
     }

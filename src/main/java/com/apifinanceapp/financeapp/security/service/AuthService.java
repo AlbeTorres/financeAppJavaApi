@@ -1,7 +1,5 @@
 package com.apifinanceapp.financeapp.security.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,14 +13,18 @@ import com.apifinanceapp.financeapp.security.jwt.JWTService;
 @Service
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JWTService jwtService;
+    private final JWTService jwtService;
+
+    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager,
+            JWTService jwtService) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
@@ -31,13 +33,13 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public String loginUser(String username, String password) {
+    public String loginUser(String email, String password) {
 
         Authentication auth = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+                .authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
         if (auth.isAuthenticated()) {
-            return jwtService.generateToken(username);
+            return jwtService.generateToken(email);
 
         }
         return "Invalid Credentials";
