@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.security.payload.AuthRequest;
+import com.apifinanceapp.financeapp.security.payload.ResendVerifyRequest;
 import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
+import com.apifinanceapp.financeapp.security.payload.VerifyUserEmailRequest;
 import com.apifinanceapp.financeapp.security.service.AuthService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,16 @@ public class AuthController {
     @PostMapping("/register")
     public User userRegister(@RequestBody UserCreateRequest user) {
         return authService.registerUser(user);
+    }
+
+    @PostMapping("/verify-email")
+    public String userEmailVerifier(@RequestBody VerifyUserEmailRequest verifyUserEmailRequest) {
+        return authService.verifyUser(verifyUserEmailRequest.getVerificationCode());
+    }
+
+    @PostMapping("/resend-verification-token")
+    public String resendUserEmailVerifier(@RequestBody ResendVerifyRequest resendVerifyRequest) {
+        return authService.resendVerificationToken(resendVerifyRequest.getEmail());
     }
 
     @PostMapping("/login")
