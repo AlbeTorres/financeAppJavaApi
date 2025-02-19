@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.security.payload.AuthRequest;
+import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 import com.apifinanceapp.financeapp.security.service.AuthService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User userRegister(@RequestBody User user) {
-        System.out.println("hola mundo register");
+    public User userRegister(@RequestBody UserCreateRequest user) {
         return authService.registerUser(user);
     }
 

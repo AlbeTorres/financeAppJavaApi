@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apifinanceapp.financeapp.dto.user.UserCreateRequest;
 import com.apifinanceapp.financeapp.dto.user.UserResponse;
 import com.apifinanceapp.financeapp.model.User;
+import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 import com.apifinanceapp.financeapp.service.UserService;
 
 @RestController

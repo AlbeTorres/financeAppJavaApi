@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.apifinanceapp.financeapp.dto.user.UserCreateRequest;
 import com.apifinanceapp.financeapp.dto.user.UserResponse;
 import com.apifinanceapp.financeapp.mappers.UserMapper;
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.repository.UserRepository;
+import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 
 import lombok.RequiredArgsConstructor;
 

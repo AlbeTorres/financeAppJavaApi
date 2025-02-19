@@ -1,4 +1,4 @@
-package com.apifinanceapp.financeapp.dto.user;
+package com.apifinanceapp.financeapp.security.payload;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

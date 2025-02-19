@@ -1,5 +1,5 @@
 
-package com.apifinanceapp.financeapp.email;
+package com.apifinanceapp.financeapp.email.config;
 
 import java.util.Properties;
 
