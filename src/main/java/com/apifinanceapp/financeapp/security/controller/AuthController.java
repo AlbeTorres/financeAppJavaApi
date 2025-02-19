@@ -3,10 +3,10 @@ package com.apifinanceapp.financeapp.security.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.security.payload.AuthRequest;
 import com.apifinanceapp.financeapp.security.payload.ResendVerifyRequest;
 import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
+import com.apifinanceapp.financeapp.security.payload.UserCreateResponse;
 import com.apifinanceapp.financeapp.security.payload.VerifyUserEmailRequest;
 import com.apifinanceapp.financeapp.security.service.AuthService;
 
@@ -24,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User userRegister(@RequestBody UserCreateRequest user) {
+    public UserCreateResponse userRegister(@RequestBody UserCreateRequest user) {
         return authService.registerUser(user);
     }
 

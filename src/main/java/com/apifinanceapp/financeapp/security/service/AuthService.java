@@ -17,6 +17,7 @@ import com.apifinanceapp.financeapp.security.jwt.JWTService;
 import com.apifinanceapp.financeapp.security.model.PasswordToken;
 import com.apifinanceapp.financeapp.security.model.VerificationToken;
 import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
+import com.apifinanceapp.financeapp.security.payload.UserCreateResponse;
 import com.apifinanceapp.financeapp.security.repository.PasswordTokenRepository;
 import com.apifinanceapp.financeapp.security.repository.VerificationTokenRepository;
 
@@ -50,7 +51,7 @@ public class AuthService {
         this.passwordTokenRepository = passwordTokenRepository;
     }
 
-    public User registerUser(UserCreateRequest userData) {
+    public UserCreateResponse registerUser(UserCreateRequest userData) {
 
         // Validar que el user enviado contenga los campos requeridos
         if (userData.getEmail() == null || userData.getPassword() == null || userData.getName() == null
@@ -87,7 +88,9 @@ public class AuthService {
 
         // TODO generar dto para devolver user y token al registrarse
 
-        return dbUser;
+        UserCreateResponse response = new UserCreateResponse(dbUser, jwToken);
+
+        return response;
 
     }
 
