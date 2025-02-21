@@ -1,20 +1,26 @@
 package com.apifinanceapp.financeapp.security.service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.apifinanceapp.financeapp.mappers.UserMapper;
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.model.common.Role;
 import com.apifinanceapp.financeapp.repository.UserRepository;
 import com.apifinanceapp.financeapp.security.jwt.JWTService;
 import com.apifinanceapp.financeapp.security.model.PasswordToken;
+import com.apifinanceapp.financeapp.security.model.UserPrincipal;
 import com.apifinanceapp.financeapp.security.model.VerificationToken;
 import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 import com.apifinanceapp.financeapp.security.payload.UserCreateResponse;
@@ -23,6 +29,8 @@ import com.apifinanceapp.financeapp.security.repository.VerificationTokenReposit
 
 @Service
 public class AuthService {
+
+    private final UserMapper userMapper;
 
     private final UserRepository userRepository;
 
@@ -41,7 +49,8 @@ public class AuthService {
     public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager,
             JWTService jwtService, BCryptPasswordEncoder passwordEncoder,
             VerificationTokenRepository verificationTokenRepository, AuthEmailService emailService,
-            PasswordTokenRepository passwordTokenRepository) {
+            PasswordTokenRepository passwordTokenRepository, UserMapper userMapper) {
+        this.userMapper = userMapper;
         this.verificationTokenRepository = verificationTokenRepository;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
@@ -84,11 +93,11 @@ public class AuthService {
         // enviar email con el token de verificación
         emailService.sendVerificationEmail(dbUser.getEmail(), verificationToken.getToken());
 
-        String jwToken = loginUser(dbUser.getEmail(), user.getPassword());
+        String jwToken = loginUser(dbUser.getEmail(), userData.getPassword());
 
         // TODO generar dto para devolver user y token al registrarse
 
-        UserCreateResponse response = new UserCreateResponse(dbUser, jwToken);
+        UserCreateResponse response = new UserCreateResponse(userMapper.toResponse(dbUser), jwToken);
 
         return response;
 
@@ -107,8 +116,15 @@ public class AuthService {
     }
 
     public String verifyUser(String token) {
+
+        String email = getAuthenticatedUsername();
+
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
+
+        if (!verificationToken.getEmail().equals(email)) {
+            throw new RuntimeException("User not authorized");
+        }
 
         if (jwtService.validateToken(token, verificationToken.getEmail())) {
 
@@ -123,6 +139,8 @@ public class AuthService {
             user.setEmailVerified(localDateTime);
 
             userRepository.save(user);
+
+            verificationTokenRepository.delete(verificationToken);
 
             return "User Verified";
 
@@ -152,18 +170,22 @@ public class AuthService {
         return "Token Resent";
     }
 
-    public void forgotPassword(String email) {
+    public String forgotPassword(String email) {
 
         userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
         PasswordToken passwordToken = new PasswordToken();
-        passwordToken.setToken(jwtService.generateVerificationToken(email));
+
+        String token = generateSecureToken();
+        passwordToken.setToken(token);
         passwordToken.setEmail(email);
 
         passwordTokenRepository.save(passwordToken);
 
         // enviar email con el token de verificación
         emailService.sendVerificationEmail(email, passwordToken.getToken());
+
+        return "Email Sent";
     }
 
     public String resetPassword(String token, String oldPassword, String newPassword) {
@@ -171,23 +193,35 @@ public class AuthService {
         PasswordToken passwordToken = passwordTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
 
-        if (jwtService.validateToken(token, passwordToken.getEmail())) {
+        User user = userRepository.findByEmail(passwordToken.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            User user = userRepository.findByEmail(passwordToken.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
 
-            if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            passwordTokenRepository.delete(passwordToken);
 
-                user.setPassword(passwordEncoder.encode(newPassword));
-                userRepository.save(user);
-
-                return "Password Changed";
-            } else {
-                return "Invalid Password";
-            }
-
+            return "Password Changed";
         } else {
-            throw new RuntimeException("Invalid Token");
+            return "Invalid Password";
+        }
+    }
+
+    public static String generateSecureToken() {
+        SecureRandom secureRandom = new SecureRandom(); // No necesita manejo de excepciones
+        byte[] tokenBytes = new byte[32]; // 256 bits
+        secureRandom.nextBytes(tokenBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+    }
+
+    public String getAuthenticatedUsername() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserPrincipal) {
+            return ((UserPrincipal) principal).getEmail();
+        } else {
+            return principal.toString(); // En caso de ser solo un string (ej: token JWT)
         }
     }
 

@@ -1,6 +1,6 @@
 package com.apifinanceapp.financeapp.security.payload;
 
-import com.apifinanceapp.financeapp.model.User;
+import com.apifinanceapp.financeapp.dto.user.UserResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserCreateResponse {
 
-    User user;
+    UserResponse userResponse;
     String token;
 }

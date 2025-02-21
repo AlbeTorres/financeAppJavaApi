@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ResendVerifyRequest {
+public class TokenVerificationRequest {
 
-    @NotEmpty(message = "Email is required")
-    private String email;
+    @NotEmpty(message = "Verification Code is required")
+    private String verificationCode;
 }

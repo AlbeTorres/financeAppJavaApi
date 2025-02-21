@@ -40,7 +40,8 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         return httpSecurity.csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, "/auth/verify-email")
+                        .authenticated().requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
