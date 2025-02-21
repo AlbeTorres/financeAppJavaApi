@@ -183,7 +183,7 @@ public class AuthService {
         passwordTokenRepository.save(passwordToken);
 
         // enviar email con el token de verificación
-        emailService.sendVerificationEmail(email, passwordToken.getToken());
+        emailService.sendPasswordResetEmail(email, passwordToken.getToken());
 
         return "Email Sent";
     }

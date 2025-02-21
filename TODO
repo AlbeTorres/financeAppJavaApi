@@ -1,4 +1,7 @@
-Email verification
+<!-- Email verification -->
+PasswordReset
+Metodo para garantizar que solo el usuario autorizado modifique su data
+metodo para garantizar que solo el rol autorizado haga los cambios
 2fa Email
 Documentation opne api swagger
 Crud other entities

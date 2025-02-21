@@ -8,8 +8,8 @@ import lombok.Data;
 @Builder
 public class PasswordResetRequest {
 
-    @NotEmpty(message = "Email is required")
-    private String email;
+    @NotEmpty(message = "Token is required")
+    private String token;
 
     @NotEmpty(message = "Old Password is required")
     private String oldPassword;

@@ -55,7 +55,7 @@ public class AuthController {
 
     @PostMapping("/password-reset")
     public String userPasswordRenew(@RequestBody PasswordResetRequest resetPasswordRequest) {
-        return authService.resetPassword(resetPasswordRequest.getEmail(), resetPasswordRequest.getOldPassword(),
+        return authService.resetPassword(resetPasswordRequest.getToken(), resetPasswordRequest.getOldPassword(),
                 resetPasswordRequest.getNewPassword());
 
     }
