@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +19,13 @@ import com.apifinanceapp.financeapp.model.common.Role;
 import com.apifinanceapp.financeapp.repository.UserRepository;
 import com.apifinanceapp.financeapp.security.jwt.JWTService;
 import com.apifinanceapp.financeapp.security.model.PasswordToken;
+import com.apifinanceapp.financeapp.security.model.TwoFactorCode;
 import com.apifinanceapp.financeapp.security.model.UserPrincipal;
 import com.apifinanceapp.financeapp.security.model.VerificationToken;
 import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 import com.apifinanceapp.financeapp.security.payload.UserCreateResponse;
 import com.apifinanceapp.financeapp.security.repository.PasswordTokenRepository;
+import com.apifinanceapp.financeapp.security.repository.TwoFactorCodeRepository;
 import com.apifinanceapp.financeapp.security.repository.VerificationTokenRepository;
 
 @Service
@@ -46,10 +47,14 @@ public class AuthService {
 
     private final AuthEmailService emailService;
 
+    private final TwoFactorCodeRepository twoFactorCodeRepository;
+
     public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager,
             JWTService jwtService, BCryptPasswordEncoder passwordEncoder,
             VerificationTokenRepository verificationTokenRepository, AuthEmailService emailService,
-            PasswordTokenRepository passwordTokenRepository, UserMapper userMapper) {
+            PasswordTokenRepository passwordTokenRepository, UserMapper userMapper,
+            TwoFactorCodeRepository twoFactorCodeRepository) {
+        this.twoFactorCodeRepository = twoFactorCodeRepository;
         this.userMapper = userMapper;
         this.verificationTokenRepository = verificationTokenRepository;
         this.userRepository = userRepository;
@@ -109,10 +114,49 @@ public class AuthService {
                 .authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
         if (auth.isAuthenticated()) {
+            // Obtén el usuario autenticado desde el Authentication
+            UserPrincipal authUser = (UserPrincipal) auth.getPrincipal();
+
+            if (authUser.getIsTwoFactorEnabled()) {
+                // Generar código de verificación
+                String code = generateDigitCode();
+
+                // Guardar el código en la base de datos
+                TwoFactorCode twoFactorCode = new TwoFactorCode();
+                twoFactorCode.setCode(code);
+                twoFactorCode.setEmail(authUser.getEmail());
+                twoFactorCode.setExpiryDate(new Date(System.currentTimeMillis() + 1000 * 60 * 5));
+                twoFactorCodeRepository.save(twoFactorCode);
+
+                // Enviar código de verificación al usuario
+                emailService.sendTwoFactorCodeEmail(authUser.getEmail(), code);
+
+                // Respuesta temporal (no JWT final aún)
+                return "2FA_REQUIRED:" + authUser.getEmail();
+
+            }
+
             return jwtService.generateToken(email);
 
         }
         return "Invalid Credentials";
+    }
+
+    public String verify2FA(String email, String code) {
+        TwoFactorCode twoFactorCode = twoFactorCodeRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Code not found"));
+
+        if (twoFactorCode.getExpiryDate().before(new Date())) {
+            twoFactorCodeRepository.delete(twoFactorCode);
+            throw new RuntimeException("Code Expired");
+        }
+
+        if (twoFactorCode.getCode().equals(code)) {
+            twoFactorCodeRepository.delete(twoFactorCode);
+            return jwtService.generateToken(email);
+        } else {
+            throw new RuntimeException("Invalid Code");
+        }
     }
 
     public String verifyUser(String token) {
@@ -179,6 +223,7 @@ public class AuthService {
         String token = generateSecureToken();
         passwordToken.setToken(token);
         passwordToken.setEmail(email);
+        passwordToken.setExpiryDate(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
 
         passwordTokenRepository.save(passwordToken);
 
@@ -193,6 +238,11 @@ public class AuthService {
         PasswordToken passwordToken = passwordTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
 
+        if (passwordToken.getExpiryDate().before(new Date())) {
+            passwordTokenRepository.delete(passwordToken);
+            throw new RuntimeException("Token Expired");
+        }
+
         User user = userRepository.findByEmail(passwordToken.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -204,7 +254,7 @@ public class AuthService {
 
             return "Password Changed";
         } else {
-            return "Invalid Password";
+            throw new RuntimeException("Invalid Password");
         }
     }
 
@@ -213,6 +263,13 @@ public class AuthService {
         byte[] tokenBytes = new byte[32]; // 256 bits
         secureRandom.nextBytes(tokenBytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+    }
+
+    public static String generateDigitCode() {
+        SecureRandom random = new SecureRandom();
+        // Genera un número entre 1000 y 9999 (asegurando 4 dígitos)
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
     }
 
     public String getAuthenticatedUsername() {

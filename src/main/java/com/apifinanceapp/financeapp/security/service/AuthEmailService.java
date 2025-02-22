@@ -68,4 +68,31 @@ public class AuthEmailService {
         }
     }
 
+    public void sendTwoFactorCodeEmail(String email, String code) {
+        // TODO update con company logo
+        String subject = "2FA Code";
+
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Your 2FA Code</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the code below to confirm your login:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">2FA Code:</h3>"
+                + "<a style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + "https://localhost"
+                + "/password/"
+                + code + "</a>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendEmail(email, subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apifinanceapp.financeapp.security.payload.AuthRequest;
+import com.apifinanceapp.financeapp.security.payload.CodeVerifyRequest;
 import com.apifinanceapp.financeapp.security.payload.PasswordResetRequest;
 import com.apifinanceapp.financeapp.security.payload.SendTokenRequest;
 import com.apifinanceapp.financeapp.security.payload.TokenVerificationRequest;
@@ -12,6 +13,8 @@ import com.apifinanceapp.financeapp.security.payload.UserCreateResponse;
 
 import com.apifinanceapp.financeapp.security.service.AuthService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -44,7 +47,6 @@ public class AuthController {
     public String userLogin(@RequestBody AuthRequest authenticationRequest) {
         return authService.loginUser(authenticationRequest.getEmail(),
                 authenticationRequest.getPassword());
-
     }
 
     @PostMapping("/password-reset-token")
@@ -58,6 +60,17 @@ public class AuthController {
         return authService.resetPassword(resetPasswordRequest.getToken(), resetPasswordRequest.getOldPassword(),
                 resetPasswordRequest.getNewPassword());
 
+    }
+
+    @PostMapping("/verify-2fa")
+    public ResponseEntity<String> verify2FA(@RequestBody CodeVerifyRequest codeVerifyRequest) {
+
+        String token = authService.verify2FA(codeVerifyRequest.getEmail(), codeVerifyRequest.getVerificationCode());
+
+        if (token != null) {
+            return ResponseEntity.ok(token);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código inválido");
     }
 
 }
