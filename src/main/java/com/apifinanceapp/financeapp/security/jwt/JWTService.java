@@ -43,6 +43,17 @@ public class JWTService {
 
     }
 
+    // Genera el jwt de verification para 10 minutos
+    public String generateVerificationToken(String email) {
+
+        Map<String, Object> claims = new HashMap<>();
+
+        return Jwts.builder().claims().add(claims).subject(email).issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10)).and().signWith(getKey())
+                .compact();
+
+    }
+
     // Valida el jwt
     public boolean validateToken(String token, String email) {
         final String emailToken = extractEmail(token);

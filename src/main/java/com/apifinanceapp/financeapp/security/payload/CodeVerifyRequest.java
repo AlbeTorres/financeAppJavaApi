@@ -4,11 +4,10 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class AuthRequest {
-
+public class CodeVerifyRequest {
     @NotEmpty(message = "Email is required")
     private String email;
 
-    @NotEmpty(message = "Password is required")
-    private String password;
+    @NotEmpty(message = "2FA Code is required")
+    private String verificationCode;
 }

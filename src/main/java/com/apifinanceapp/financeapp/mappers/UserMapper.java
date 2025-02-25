@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.apifinanceapp.financeapp.dto.user.UserCreateRequest;
 import com.apifinanceapp.financeapp.dto.user.UserResponse;
 import com.apifinanceapp.financeapp.dto.user.UserUpdateRequest;
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.model.common.Role;
+import com.apifinanceapp.financeapp.security.payload.UserCreateRequest;
 
 @Component
 public class UserMapper {

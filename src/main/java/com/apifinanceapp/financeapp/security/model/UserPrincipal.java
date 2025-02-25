@@ -31,6 +31,14 @@ public class UserPrincipal implements UserDetails {
         return user.getUsername();
     }
 
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public boolean getIsTwoFactorEnabled() {
+        return user.isTwofactorEnabled();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         // TODO Auto-generated method stub

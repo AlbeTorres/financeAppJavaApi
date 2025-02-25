@@ -1,0 +1,15 @@
+<!-- Email verification -->
+PasswordReset-----done---
+2fa Email----done---
+
+
+garantizar que solo el usuario autorizado modifique su data
+metodo para garantizar que solo el rol autorizado haga los cambios
+Documentation opne api swagger
+Crud other entities
+Pagination transaction
+Unit testing
+Work with exceptions to respond request
+How to habilitate login auth for the documentation only
+Oauth from the server once the user gets authenticate in the client by this way
+hacer que si el usuario no esta vericado no pueda accder a los recursos de cada controller todo debe retotnar usser not verified
