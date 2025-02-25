@@ -1,9 +1,10 @@
 <!-- Email verification -->
-PasswordReset
-cambiar todo para que en lugar de un token se envie 6 digitos en el email
-Metodo para garantizar que solo el usuario autorizado modifique su data
+PasswordReset-----done---
+2fa Email----done---
+
+
+garantizar que solo el usuario autorizado modifique su data
 metodo para garantizar que solo el rol autorizado haga los cambios
-2fa Email
 Documentation opne api swagger
 Crud other entities
 Pagination transaction
