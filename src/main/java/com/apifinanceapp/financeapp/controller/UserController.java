@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // Solo los usuarios con el rol ADMIN pueden acceder a este endpoint
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers() {
         List<UserResponse> users = userService.getUsers();
@@ -46,6 +48,7 @@ public class UserController {
         return ResponseEntity.ok(user.get());
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // Solo los usuarios con el rol ADMIN pueden acceder a este endpoint
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserCreateRequest userRequest) {
 
