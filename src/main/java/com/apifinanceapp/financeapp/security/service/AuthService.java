@@ -6,6 +6,8 @@ import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 
+import org.springframework.http.HttpStatus;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,8 @@ import com.apifinanceapp.financeapp.mappers.UserMapper;
 import com.apifinanceapp.financeapp.model.User;
 import com.apifinanceapp.financeapp.model.common.Role;
 import com.apifinanceapp.financeapp.repository.UserRepository;
+
+import com.apifinanceapp.financeapp.security.exception.ResponseException;
 import com.apifinanceapp.financeapp.security.jwt.JWTService;
 import com.apifinanceapp.financeapp.security.model.PasswordToken;
 import com.apifinanceapp.financeapp.security.model.TwoFactorCode;
@@ -70,12 +74,20 @@ public class AuthService {
         // Validar que el user enviado contenga los campos requeridos
         if (userData.getEmail() == null || userData.getPassword() == null || userData.getName() == null
                 || userData.getUsername() == null) {
-            throw new RuntimeException("Invalid fields");
+            throw new ResponseException(HttpStatus.BAD_REQUEST, "Invalid fields");
+        }
+
+        // Validar que la contraseña tenga 8 caracteres minimo, no contega espacios y
+        // contenga al menos un número y un caracter especial
+        if (!userData.getPassword()
+                .matches("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$")) {
+            throw new ResponseException(HttpStatus.BAD_REQUEST,
+                    "Password must contain at least 8 characters, one number, one special character and no spaces");
         }
 
         // Validar que el email no exista en la base de datos
         if (userRepository.findByEmail(userData.getEmail()).isPresent()) {
-            throw new RuntimeException("Email alredy used");
+            throw new ResponseException(HttpStatus.CONFLICT, "Email alredy used");
         }
 
         User user = new User();
@@ -99,8 +111,6 @@ public class AuthService {
         emailService.sendVerificationEmail(dbUser.getEmail(), verificationToken.getToken());
 
         String jwToken = loginUser(dbUser.getEmail(), userData.getPassword());
-
-        // TODO generar dto para devolver user y token al registrarse
 
         UserCreateResponse response = new UserCreateResponse(userMapper.toResponse(dbUser), jwToken);
 
@@ -139,23 +149,23 @@ public class AuthService {
             return jwtService.generateToken(email);
 
         }
-        return "Invalid Credentials";
+        throw new ResponseException(HttpStatus.UNAUTHORIZED, "Invalid Credentials");
     }
 
     public String verify2FA(String email, String code) {
         TwoFactorCode twoFactorCode = twoFactorCodeRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Code not found"));
+                .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "Code not found"));
 
         if (twoFactorCode.getExpiryDate().before(new Date())) {
             twoFactorCodeRepository.delete(twoFactorCode);
-            throw new RuntimeException("Code Expired");
+            throw new ResponseException(HttpStatus.UNAUTHORIZED, "Code Expired");
         }
 
         if (twoFactorCode.getCode().equals(code)) {
             twoFactorCodeRepository.delete(twoFactorCode);
             return jwtService.generateToken(email);
         } else {
-            throw new RuntimeException("Invalid Code");
+            throw new ResponseException(HttpStatus.BAD_REQUEST, "Invalid Code");
         }
     }
 
@@ -164,16 +174,16 @@ public class AuthService {
         String email = getAuthenticatedUsername();
 
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid Token"));
+                .orElseThrow(() -> new ResponseException(HttpStatus.BAD_REQUEST, "Invalid Token"));
 
         if (!verificationToken.getEmail().equals(email)) {
-            throw new RuntimeException("User not authorized");
+            throw new ResponseException(HttpStatus.FORBIDDEN, "User not authorized");
         }
 
         if (jwtService.validateToken(token, verificationToken.getEmail())) {
 
             User user = userRepository.findByEmail(verificationToken.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "User not found"));
 
             Date now = new Date();
             LocalDateTime localDateTime = now.toInstant()
@@ -189,19 +199,20 @@ public class AuthService {
             return "User Verified";
 
         } else {
-            throw new RuntimeException("Invalid Token");
+            throw new ResponseException(HttpStatus.BAD_REQUEST, "Invalid Token");
         }
 
     }
 
     public String resendVerificationToken(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "User not found"));
 
         VerificationToken verificationToken = verificationTokenRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Token not found"));
+                .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "Token not found"));
 
         if (user.getEmailVerified() != null) {
-            return "User already verified";
+            throw new ResponseException(HttpStatus.BAD_REQUEST, "User already verified");
         }
 
         verificationToken.setToken(jwtService.generateVerificationToken(email));
@@ -216,7 +227,8 @@ public class AuthService {
 
     public String forgotPassword(String email) {
 
-        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "User not found"));
 
         PasswordToken passwordToken = new PasswordToken();
 
@@ -236,15 +248,15 @@ public class AuthService {
     public String resetPassword(String token, String oldPassword, String newPassword) {
 
         PasswordToken passwordToken = passwordTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid Token"));
+                .orElseThrow(() -> new ResponseException(HttpStatus.BAD_REQUEST, "Invalid Token"));
 
         if (passwordToken.getExpiryDate().before(new Date())) {
             passwordTokenRepository.delete(passwordToken);
-            throw new RuntimeException("Token Expired");
+            throw new ResponseException(HttpStatus.FORBIDDEN, "Token Expired");
         }
 
         User user = userRepository.findByEmail(passwordToken.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (passwordEncoder.matches(oldPassword, user.getPassword())) {
 
@@ -254,7 +266,7 @@ public class AuthService {
 
             return "Password Changed";
         } else {
-            throw new RuntimeException("Invalid Password");
+            throw new ResponseException(HttpStatus.FORBIDDEN, "Invalid Password");
         }
     }
 
